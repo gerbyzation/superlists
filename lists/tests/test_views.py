@@ -5,20 +5,19 @@ from django.http import HttpRequest
 from django.utils.html import escape
 
 from lists.views import home_page
+from lists.forms import ItemForm
 from lists.models import Item, List
 
 
 class HomePageTest(TestCase):
 
-    def test_root_url_resolvers_to_home_page_view(self):
-        found = resolve('/')
-        self.assertEqual(found.func, home_page)
+    def test_home_page_renders_home_template(self):
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'home.html')
 
-    def test_home_page_returns_correct_html(self):
-        request = HttpRequest()
-        response = home_page(request)
-        expected_html = render_to_string('home.html')
-        self.assertEqual(response.content.decode(), expected_html)
+    def test_home_page_uses_item_form(self):
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm)
 
 
 class NewListTest(TestCase):
@@ -46,7 +45,6 @@ class NewListTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
         expected_error = escape("You can't have an empty list item")
-        print(response.content.decode())
         self.assertContains(response, expected_error)
 
     def test_invalid_list_items_arent_saved(self):
