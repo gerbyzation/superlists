@@ -16,17 +16,17 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('To-Do', header_text)
 
         # She is invited to enter a to-do item straight away
-        inputbox = self.browser.find_element_by_id('id_text')
+        inputbox = self.get_item_input_box()
         self.assertEqual(
-            inputbox.get_attribute('placeholder'),
-            'Enter a to-do item'
+                inputbox.get_attribute('placeholder'),
+                'Enter a to-do item'
         )
 
         # She types "Buy peacock feathers" into a text box (Edith's hobby
         # is tying fly-fishing lures)
         inputbox.send_keys('Buy peacock feathers')
 
-        # When she hits enter, the is taken to a new URL
+        # When she hits enter, she is taken to a new URL,
         # and now the page lists "1: Buy peacock feathers" as an item in a
         # to-do list table
         inputbox.send_keys(Keys.ENTER)
@@ -35,34 +35,33 @@ class NewVisitorTest(FunctionalTest):
         self.check_for_row_in_list_table('1: Buy peacock feathers')
 
         # There is still a text box inviting her to add another item. She
-        # enters "use peacock feather to make a fly" (Edith is very methodical)
-        inputbox = self.browser.find_element_by_id('id_text')
+        # enters "Use peacock feathers to make a fly" (Edith is very
+        # methodical)
+        inputbox = self.get_item_input_box()
         inputbox.send_keys('Use peacock feathers to make a fly')
         inputbox.send_keys(Keys.ENTER)
 
-        # THe page updates again, and now shows both items on her list
+        # The page updates again, and now shows both items on her list
+        self.check_for_row_in_list_table('2: Use peacock feathers to make a fly')
         self.check_for_row_in_list_table('1: Buy peacock feathers')
-        self.check_for_row_in_list_table(
-            '2: Use peacock feathers to make a fly'
-        )
 
-        # Now a new user, Francis, comes along to the site
+        # Now a new user, Francis, comes along to the site.
 
         ## We use a new browser session to make sure that no information
         ## of Edith's is coming through from cookies etc
         self.browser.quit()
         self.browser = webdriver.Firefox()
 
-        # Francis visits the home page. There is no sign of Edith's
+        # Francis visits the home page.  There is no sign of Edith's
         # list
         self.browser.get(self.server_url)
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertNotIn('make a fly', page_text)
 
-        # Francis starts a new list by entering a new item He
-        # is less interesting that Edith...
-        inputbox = self.browser.find_element_by_id('id_text')
+        # Francis starts a new list by entering a new item. He
+        # is less interesting than Edith...
+        inputbox = self.get_item_input_box()
         inputbox.send_keys('Buy milk')
         inputbox.send_keys(Keys.ENTER)
 
@@ -77,3 +76,4 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('Buy milk', page_text)
 
         # Satisfied, they both go back to sleep
+
