@@ -21,7 +21,6 @@ class MyListsTest(FunctionalTest):
             path='/',
         ))
 
-
     def test_logged_in_users_lists_are_saved_as_my_lists(self):
         # Edith is a logged-in user
         self.create_pre_authenticated_session('edith@example.com')
@@ -38,7 +37,9 @@ class MyListsTest(FunctionalTest):
         # She sees that her list is in there, named according to its
         # first list item
         self.browser.find_element_by_link_text('Reticulate splines').click()
-        self.assertEqual(self.browser.current_url, first_list_url)
+        self.wait_for(
+            lambda: self.assertEqual(self.browser.current_url, first_list_url)
+        )
 
         # She decides to start another list, just to see
         self.browser.get(self.server_url)
