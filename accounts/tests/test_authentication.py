@@ -3,11 +3,11 @@ from unittest.mock import patch
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-User = get_user_model()
-
 from accounts.authentication import (
     PERSONA_VERIFY_URL, PersonaAuthenticationBackend
 )
+
+User = get_user_model()
 
 
 @patch('accounts.authentication.requests.post')
@@ -18,7 +18,6 @@ class AuthenticateTest(TestCase):
         user = User(email='other@user.com')
         user.username = 'otheruser'
         user.save()
-
 
     def test_sends_assertion_to_mozilla_with_domain(self, mock_post):
         self.backend.authenticate('an assertion')
