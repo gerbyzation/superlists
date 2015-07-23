@@ -173,7 +173,6 @@ class ListViewTest(TestCase):
         )
         self.assertRedirects(response, '/lists/%d/' % (correct_list.id,))
 
-
     def post_invalid_input(self):
         list_ = List.objects.create()
         return self.client.post(
@@ -198,7 +197,6 @@ class ListViewTest(TestCase):
         response = self.post_invalid_input()
         self.assertContains(response, escape(EMPTY_ITEM_ERROR))
 
-
     def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
         list1 = List.objects.create()
         item1 = Item.objects.create(list=list1, text='textey')
@@ -213,7 +211,6 @@ class ListViewTest(TestCase):
         self.assertEqual(Item.objects.all().count(), 1)
 
 
-
 class MyListsTest(TestCase):
 
     def test_my_lists_url_renders_my_lists_template(self):
@@ -221,10 +218,28 @@ class MyListsTest(TestCase):
         response = self.client.get('/lists/users/a@b.com/')
         self.assertTemplateUsed(response, 'my_lists.html')
 
-
     def test_passes_correct_owner_to_template(self):
         User.objects.create(email='wrong@owner.com')
         correct_user = User.objects.create(email='a@b.com')
         response = self.client.get('/lists/users/a@b.com/')
         self.assertEqual(response.context['owner'], correct_user)
 
+
+class ShareListTest(TestCase):
+
+    def test_post_redirects_to_lists_page(self):
+        list_ = List.objects.create()
+        response = self.client.post(
+            '/lists/{}/share'.format(list_.id,),
+            data={'email': 'shared@me.com'}
+        )
+        self.assertRedirects(response, '/lists/{}/'.format(list_.id,))
+
+    def test_share_list_view_adds_sharee(self):
+        list_ = List.objects.create()
+        user = User.objects.create(email='some@friend.com')
+        self.client.post(
+            '/lists/{}/share'.format(list_.id),
+            data={'email': 'some@friend.com'}
+        )
+        self.assertIn(user, list_.shared_with.all())
