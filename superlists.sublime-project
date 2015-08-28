@@ -1,0 +1,11 @@
+{
+	"folders":
+	[
+		{
+			"path": "/Users/gerbenneven/Desktop/tdd-django/superlists-project"
+		}
+	],
+  "syntax_override": {
+    "\\.html$": ["Djaneiro", "Syntaxes", "HTML (Django)"]
+  }
+}
